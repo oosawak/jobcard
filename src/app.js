@@ -545,9 +545,11 @@ function bindHomeInteractions() {
     pointerId = null;
   };
 
-  const animateAway = (onFinish) => {
-    const offsetX = window.innerWidth * 1.2;
-    const offsetY = deltaY;
+  const animateAway = (direction, onFinish) => {
+    const offsetX =
+      direction === 'right' ? window.innerWidth * 1.2 : direction === 'left' ? -window.innerWidth * 1.2 : deltaX;
+    const offsetY =
+      direction === 'down' ? window.innerHeight * 1.2 : direction === 'up' ? -window.innerHeight * 1.2 : deltaY;
     const rotation = Math.max(-18, Math.min(18, deltaX / 20));
     const duration = reduceMotion ? 1 : 260;
 
@@ -613,7 +615,7 @@ function bindHomeInteractions() {
     }
 
     if (deltaX > Math.max(110, cardWidth * 0.24) && absX > absY) {
-      animateAway(() => {
+      animateAway('right', () => {
         removeCurrentJob();
         advanceCard();
       });
@@ -621,7 +623,7 @@ function bindHomeInteractions() {
     }
 
     if (deltaX < -Math.max(110, cardWidth * 0.24) && absX > absY) {
-      animateAway(() => {
+      animateAway('left', () => {
         saveCurrentJob();
         advanceCard();
       });
@@ -629,7 +631,7 @@ function bindHomeInteractions() {
     }
 
     if (deltaY > Math.max(110, cardHeight * 0.2) && absY > absX) {
-      animateAway(() => {
+      animateAway('down', () => {
         saveCurrentJob();
         advanceCard();
       });
