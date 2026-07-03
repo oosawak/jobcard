@@ -32,6 +32,7 @@ body {
 
 body {
   margin: 0;
+  overflow: hidden;
   color: var(--text);
   background:
     radial-gradient(circle at top left, rgba(37, 99, 235, 0.1), transparent 26%),
@@ -73,12 +74,13 @@ a {
 
 .shell {
   width: min(var(--max-width), 100vw);
-  min-height: 100svh;
+  height: 100svh;
+  height: 100dvh;
   margin: 0 auto;
-  padding: max(18px, env(safe-area-inset-top)) 18px calc(20px + env(safe-area-inset-bottom));
+  padding: max(12px, env(safe-area-inset-top)) 14px calc(12px + env(safe-area-inset-bottom));
   display: grid;
   grid-template-rows: auto 1fr;
-  gap: 18px;
+  gap: 10px;
 }
 
 .topbar {
@@ -99,13 +101,13 @@ a {
 
 .topbar h1 {
   margin: 0;
-  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-size: clamp(1.35rem, 3.8vw, 2rem);
   line-height: 0.98;
   max-width: 12ch;
 }
 
 .pill-button {
-  padding: 12px 16px;
+  padding: 10px 14px;
   border-radius: 999px;
   color: var(--text);
   background: rgba(255, 255, 255, 0.9);
@@ -121,22 +123,23 @@ a {
 
 .view {
   position: relative;
-  min-height: calc(100svh - 112px);
+  height: 100%;
+  min-height: 0;
   display: grid;
-  gap: 16px;
+  gap: 10px;
 }
 
 .stats {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 6px;
 }
 
 .chip {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 12px;
+  padding: 8px 10px;
   border-radius: 999px;
   color: var(--muted);
   background: rgba(255, 255, 255, 0.88);
@@ -149,23 +152,29 @@ a {
 
 .deck-shell {
   position: relative;
+  height: 100%;
+  min-height: 0;
   display: grid;
-  gap: 14px;
-  padding: 12px 0 0;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 8px;
+  padding: 4px 0 0;
 }
 
 .scene {
   position: relative;
-  min-height: min(66vh, 620px);
+  min-height: 0;
+  height: 100%;
   display: grid;
   place-items: center;
+  padding-bottom: 0;
 }
 
 .stack {
   position: relative;
   width: 100%;
   max-width: 100%;
-  min-height: min(64vh, 590px);
+  height: 100%;
+  min-height: 0;
 }
 
 .card {
@@ -174,7 +183,7 @@ a {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  padding: 18px 18px 20px;
+  padding: 10px 14px 12px;
   border-radius: var(--radius-xl);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.9)),
@@ -216,13 +225,13 @@ a {
 }
 
 .card__icon {
-  width: 72px;
-  height: 72px;
-  border-radius: 24px;
+  width: 52px;
+  height: 52px;
+  border-radius: 18px;
   background-size: cover;
   background-position: center;
-  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
-  margin-bottom: 14px;
+  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.12);
+  margin-bottom: 8px;
 }
 
 .card__headerline {
@@ -305,17 +314,17 @@ a {
 }
 
 .job-title {
-  margin: 4px 0 0;
-  font-size: clamp(1.7rem, 6vw, 2.6rem);
+  margin: 2px 0 0;
+  font-size: clamp(1.35rem, 4.8vw, 2rem);
   line-height: 0.98;
   letter-spacing: -0.03em;
 }
 
 .job-summary {
-  margin: 12px 0 0;
+  margin: 8px 0 0;
   color: #334155;
-  font-size: 0.98rem;
-  line-height: 1.65;
+  font-size: 0.88rem;
+  line-height: 1.45;
   max-width: 28ch;
 }
 
@@ -323,17 +332,17 @@ a {
   position: relative;
   z-index: 1;
   display: grid;
-  gap: 14px;
+  gap: 6px;
 }
 
 .meta-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  gap: 6px;
 }
 
 .meta {
-  padding: 14px;
+  padding: 10px;
   border-radius: var(--radius-md);
   background: #f8fafc;
   border: 1px solid var(--line);
@@ -354,26 +363,27 @@ a {
 .tag-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 4px;
 }
 
 .tag {
   display: inline-flex;
   align-items: center;
-  padding: 8px 11px;
+  padding: 6px 9px;
   border-radius: 999px;
   background: #f8fafc;
   color: #334155;
   border: 1px solid var(--line);
-  font-size: 0.82rem;
+  font-size: 0.74rem;
 }
 
 .gesture-hint {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
   color: var(--muted);
-  font-size: 0.84rem;
+  font-size: 0.78rem;
+  padding-bottom: 0;
 }
 
 .gesture-hint strong {

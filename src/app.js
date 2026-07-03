@@ -546,10 +546,10 @@ function bindHomeInteractions() {
   };
 
   const animateAway = (mode, onFinish) => {
-    const rotation = Math.max(-18, Math.min(18, deltaX / 20));
+    const rotation = Math.max(-14, Math.min(14, deltaX / 16));
     const duration = reduceMotion ? 1 : 260;
     const transforms = {
-      delete: `translate(${window.innerWidth * 1.2}px, ${deltaY}px) rotate(${rotation}deg) scale(0.98)`,
+      delete: `translate(${window.innerWidth * 1.1}px, ${deltaY * 0.4}px) rotate(${rotation}deg) scale(0.96)`,
       save: `scale(0.94)`,
     };
     const finalTransform = transforms[mode] ?? transforms.delete;
