@@ -112,6 +112,7 @@ const state = {
   saved: loadSaved(),
   entries: loadEntries(),
   jobs: [],
+  loaded: false,
   toast: null,
   toastTimer: null,
 };
@@ -133,6 +134,7 @@ init();
 
 async function init() {
   state.jobs = await loadJobs();
+  state.loaded = true;
   render();
 }
 
@@ -197,13 +199,21 @@ function writeJson(key, value) {
 }
 
 function render() {
-  if (state.jobs.length === 0) {
+  if (!state.loaded) {
     dom.app.innerHTML = '';
     dom.app.append(renderLoadingState());
     return;
   }
 
   state.route = parseRoute();
+
+  if (state.jobs.length === 0) {
+    dom.app.innerHTML = '';
+    dom.app.append(renderEmptyState());
+    renderToast();
+    return;
+  }
+
   const currentJob = getCurrentJob();
   const savedCount = state.saved.length;
 
@@ -268,7 +278,8 @@ function renderHome(currentJob) {
   const hint = document.createElement('div');
   hint.className = 'gesture-hint';
   hint.innerHTML = `
-    <span><strong>右</strong> スワイプで保存して次へ</span>
+    <span><strong>右</strong> スワイプで削除</span>
+    <span><strong>左</strong> スワイプで保存</span>
     <span>タップで詳細</span>
   `;
 
@@ -294,21 +305,16 @@ function renderCard(job, depth) {
   }
 
   const saved = state.saved.some((item) => item.id === job.id);
-  const iconStyle = `background-image: ${makeJobIcon(job)};`;
 
   card.innerHTML = `
-    <div class="card__icon" style="${iconStyle}" aria-hidden="true"></div>
-    <div class="card__headerline">
-      <span class="card__icon-label">${job.type}</span>
-      <a class="card__location" href="${makeMapsUrl(job.location)}" target="_blank" rel="noreferrer noopener">
-        ${job.location}
-      </a>
-    </div>
     <div>
       <div class="card__topline">
         <div>
           <p class="job-company">${job.company}</p>
           <h2 class="job-title">${job.title}</h2>
+          <a class="card__location" href="${makeMapsUrl(job.location)}" target="_blank" rel="noreferrer noopener">
+            ${job.location}
+          </a>
         </div>
         <span class="badge ${saved ? 'badge--secondary' : ''}">${saved ? 'Saved' : job.type}</span>
       </div>
@@ -608,6 +614,14 @@ function bindHomeInteractions() {
 
     if (deltaX > Math.max(110, cardWidth * 0.24) && absX > absY) {
       animateAway(() => {
+        removeCurrentJob();
+        advanceCard();
+      });
+      return;
+    }
+
+    if (deltaX < -Math.max(110, cardWidth * 0.24) && absX > absY) {
+      animateAway(() => {
         saveCurrentJob();
         advanceCard();
       });
@@ -702,6 +716,13 @@ function saveCurrentJob() {
   showToast('保存しました', `${job.company} を保存済みに追加しました。`);
 }
 
+function removeCurrentJob() {
+  const job = getCurrentJob();
+  state.jobs = state.jobs.filter((item) => item.id !== job.id);
+  state.index = Math.min(state.index, Math.max(state.jobs.length - 1, 0));
+  showToast('削除しました', `${job.company} を候補から外しました。`);
+}
+
 function removeSaved(jobId) {
   state.saved = state.saved.filter((item) => item.id !== jobId);
   persistSaved();
@@ -779,54 +800,6 @@ function createId() {
   }
 
   return `entry-${Date.now().toString(36)}-${Math.random().toString(16).slice(2)}`;
-}
-
-function makeJobIcon(job) {
-  const colors = [
-    ['#ffedd5', '#fb7185', '#f97316'],
-    ['#dbeafe', '#38bdf8', '#2563eb'],
-    ['#dcfce7', '#34d399', '#059669'],
-    ['#f3e8ff', '#c084fc', '#7c3aed'],
-    ['#fae8ff', '#f472b6', '#db2777'],
-    ['#fef3c7', '#f59e0b', '#d97706'],
-    ['#cffafe', '#22d3ee', '#0ea5e9'],
-  ];
-  const hash = Array.from(job.id).reduce((value, char) => value + char.charCodeAt(0), 0);
-  const [start, mid, end] = colors[hash % colors.length];
-  const iconSet = [
-    `<rect x='254' y='170' width='292' height='172' rx='52' fill='rgba(255,255,255,0.88)'/>`,
-    `<rect x='226' y='130' width='348' height='220' rx='42' fill='rgba(255,255,255,0.88)'/>`,
-    `<circle cx='400' cy='180' r='132' fill='rgba(255,255,255,0.88)'/>`,
-    `<path d='M210 260h380l-56 80H266z' fill='rgba(255,255,255,0.88)'/>`,
-  ];
-  const shape = iconSet[hash % iconSet.length];
-  const accent = [
-    `<path d='M290 150h220v34H290z' fill='${mid}' opacity='0.86'/>`,
-    `<path d='M306 184h188v28H306z' fill='${mid}' opacity='0.7'/>`,
-    `<circle cx='400' cy='182' r='52' fill='${start}' opacity='0.9'/>`,
-    `<path d='M318 200h164v18H318z' fill='${end}' opacity='0.86'/>`,
-  ][hash % 4];
-
-  return `url("data:image/svg+xml,${encodeURIComponent(`
-    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 360' role='img' aria-label='${job.company}のアイコン'>
-      <defs>
-        <linearGradient id='g' x1='0%' y1='0%' x2='100%' y2='100%'>
-          <stop offset='0%' stop-color='${start}'/>
-          <stop offset='52%' stop-color='${mid}'/>
-          <stop offset='100%' stop-color='${end}'/>
-        </linearGradient>
-      </defs>
-      <rect width='800' height='360' rx='34' fill='url(#g)'/>
-      <circle cx='190' cy='94' r='70' fill='rgba(255,255,255,0.18)'/>
-      <circle cx='650' cy='278' r='96' fill='rgba(255,255,255,0.16)'/>
-      <g transform='translate(0 4)'>
-        <rect x='144' y='110' width='512' height='144' rx='42' fill='rgba(255,255,255,0.34)'/>
-        ${shape}
-        ${accent}
-      </g>
-      <text x='64' y='312' fill='white' font-size='44' font-family='system-ui, -apple-system, sans-serif' font-weight='700' letter-spacing='1.5'>JOB</text>
-    </svg>
-  `)}")`;
 }
 
 function makeMapsUrl(location) {
