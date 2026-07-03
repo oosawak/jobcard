@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#07111f">
+    <title>jobcard</title>
+    <meta
+      name="description"
+      content="スマートフォン向けの仕事カードをスワイプして探せる jobcard デモ"
+    >
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <div class="shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">jobcard</p>
+          <h1>Swipe to find your next move.</h1>
+        </div>
+        <button id="saved-button" class="pill-button" type="button" aria-label="保存済みの仕事を見る">
+          保存 0
+        </button>
+      </header>
+
+      <main id="app" class="app" aria-live="polite"></main>
+    </div>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
