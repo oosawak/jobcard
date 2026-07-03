@@ -279,7 +279,7 @@ function renderHome(currentJob) {
   hint.className = 'gesture-hint';
   hint.innerHTML = `
     <span><strong>右</strong> スワイプで削除</span>
-    <span><strong>左</strong> スワイプで保存</span>
+    <span><strong>左</strong> / <strong>下</strong> で保存</span>
     <span>タップで詳細</span>
   `;
 
@@ -621,6 +621,14 @@ function bindHomeInteractions() {
     }
 
     if (deltaX < -Math.max(110, cardWidth * 0.24) && absX > absY) {
+      animateAway(() => {
+        saveCurrentJob();
+        advanceCard();
+      });
+      return;
+    }
+
+    if (deltaY > Math.max(110, cardHeight * 0.2) && absY > absX) {
       animateAway(() => {
         saveCurrentJob();
         advanceCard();
