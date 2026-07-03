@@ -381,6 +381,7 @@ a {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+  margin: 0;
   color: var(--muted);
   font-size: 0.78rem;
   padding-bottom: 0;
