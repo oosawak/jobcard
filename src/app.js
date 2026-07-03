@@ -277,6 +277,7 @@ function renderHome(currentJob) {
 
   const hint = document.createElement('div');
   hint.className = 'gesture-hint';
+  hint.style.marginBottom = '100px';
   hint.innerHTML = `
     <span><strong>右</strong> スワイプで削除</span>
     <span><strong>左</strong> スワイプで保存</span>
