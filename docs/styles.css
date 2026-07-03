@@ -100,7 +100,7 @@ a {
 .topbar h1 {
   margin: 0;
   font-size: clamp(1.6rem, 4vw, 2.4rem);
-  line-height: 1.03;
+  line-height: 0.98;
   max-width: 12ch;
 }
 
@@ -307,7 +307,7 @@ a {
 .job-title {
   margin: 4px 0 0;
   font-size: clamp(1.7rem, 6vw, 2.6rem);
-  line-height: 1.02;
+  line-height: 0.98;
   letter-spacing: -0.03em;
 }
 
@@ -479,7 +479,7 @@ a {
 .sheet__header h2 {
   margin: 0;
   font-size: clamp(1.5rem, 5vw, 2.2rem);
-  line-height: 1.08;
+  line-height: 1.02;
 }
 
 .sheet__header p {
