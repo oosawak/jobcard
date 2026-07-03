@@ -616,9 +616,10 @@ function bindHomeInteractions() {
     }
 
     if (deltaX > Math.max(110, cardWidth * 0.24) && absX > absY) {
-      removeCurrentJob();
-      reset();
-      advanceCard();
+      animateAway('delete', () => {
+        removeCurrentJob();
+        advanceCard();
+      });
       return;
     }
 
