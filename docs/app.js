@@ -545,16 +545,18 @@ function bindHomeInteractions() {
     pointerId = null;
   };
 
-  const animateAway = (direction, onFinish) => {
-    const offsetX =
-      direction === 'right' ? window.innerWidth * 1.2 : direction === 'left' ? -window.innerWidth * 1.2 : deltaX;
-    const offsetY =
-      direction === 'down' ? window.innerHeight * 1.2 : direction === 'up' ? -window.innerHeight * 1.2 : deltaY;
+  const animateAway = (mode, onFinish) => {
     const rotation = Math.max(-18, Math.min(18, deltaX / 20));
     const duration = reduceMotion ? 1 : 260;
+    const transforms = {
+      delete: `translate(${deltaX * 0.12}px, ${deltaY * 0.12}px) rotate(${rotation * 0.4}deg) scale(0.94)`,
+      left: `translate(${-window.innerWidth * 1.2}px, ${deltaY}px) rotate(${rotation}deg) scale(0.98)`,
+      down: `translate(${deltaX}px, ${window.innerHeight * 1.2}px) rotate(${rotation}deg) scale(0.98)`,
+    };
+    const finalTransform = transforms[mode] ?? transforms.delete;
 
     topCard.style.transition = `transform ${duration}ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity ${duration}ms ease`;
-    topCard.style.transform = `translate(${offsetX}px, ${offsetY}px) rotate(${rotation}deg) scale(0.98)`;
+    topCard.style.transform = finalTransform;
     topCard.style.opacity = '0';
 
     window.setTimeout(() => {
@@ -615,7 +617,7 @@ function bindHomeInteractions() {
     }
 
     if (deltaX > Math.max(110, cardWidth * 0.24) && absX > absY) {
-      animateAway('right', () => {
+      animateAway('delete', () => {
         removeCurrentJob();
         advanceCard();
       });
