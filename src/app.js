@@ -268,8 +268,7 @@ function renderHome(currentJob) {
   const hint = document.createElement('div');
   hint.className = 'gesture-hint';
   hint.innerHTML = `
-    <span><strong>右</strong> スワイプで次へ</span>
-    <span><strong>下</strong> スワイプで保存</span>
+    <span><strong>右</strong> スワイプで保存して次へ</span>
     <span>タップで詳細</span>
   `;
 
@@ -295,8 +294,16 @@ function renderCard(job, depth) {
   }
 
   const saved = state.saved.some((item) => item.id === job.id);
+  const iconStyle = `background-image: ${makeJobIcon(job)};`;
 
   card.innerHTML = `
+    <div class="card__icon" style="${iconStyle}" aria-hidden="true"></div>
+    <div class="card__headerline">
+      <span class="card__icon-label">${job.type}</span>
+      <a class="card__location" href="${makeMapsUrl(job.location)}" target="_blank" rel="noreferrer noopener">
+        ${job.location}
+      </a>
+    </div>
     <div>
       <div class="card__topline">
         <div>
@@ -337,7 +344,11 @@ function renderJobSheet(job) {
       <header class="sheet__header">
         <p class="eyebrow">Job detail</p>
         <h2>${job.title}</h2>
-        <p>${job.company} ・ ${job.location} ・ ${job.type}</p>
+        <p>
+          ${job.company} ・
+          <a class="sheet__location-link" href="${makeMapsUrl(job.location)}" target="_blank" rel="noreferrer noopener">${job.location}</a>
+          ・ ${job.type}
+        </p>
         <p>${job.description}</p>
       </header>
       <div class="detail-grid">
@@ -432,7 +443,7 @@ function renderSavedSheet() {
         <header class="sheet__header">
           <p class="eyebrow">Saved jobs</p>
           <h2>保存済みはまだありません</h2>
-          <p>下スワイプで気になる仕事を保存すると、この一覧に残ります。</p>
+          <p>右スワイプで気になる仕事を保存すると、この一覧に残ります。</p>
         </header>
         <footer class="sheet__footer">
           <button class="secondary-button" type="button" data-action="close">カードに戻る</button>
@@ -449,7 +460,7 @@ function renderSavedSheet() {
       <header class="sheet__header">
         <p class="eyebrow">Saved jobs</p>
         <h2>保存済みの仕事</h2>
-        <p>下スワイプで残した候補を確認できます。</p>
+        <p>右スワイプで残した候補を確認できます。</p>
       </header>
       <div class="saved-list">
         ${state.saved
@@ -528,9 +539,9 @@ function bindHomeInteractions() {
     pointerId = null;
   };
 
-  const animateAway = (direction, onFinish) => {
-    const offsetX = direction === 'right' ? window.innerWidth * 1.2 : deltaX;
-    const offsetY = direction === 'down' ? window.innerHeight * 1.2 : deltaY;
+  const animateAway = (onFinish) => {
+    const offsetX = window.innerWidth * 1.2;
+    const offsetY = deltaY;
     const rotation = Math.max(-18, Math.min(18, deltaX / 20));
     const duration = reduceMotion ? 1 : 260;
 
@@ -596,12 +607,7 @@ function bindHomeInteractions() {
     }
 
     if (deltaX > Math.max(110, cardWidth * 0.24) && absX > absY) {
-      animateAway('right', advanceCard);
-      return;
-    }
-
-    if (deltaY > Math.max(110, cardHeight * 0.2) && absY > absX) {
-      animateAway('down', () => {
+      animateAway(() => {
         saveCurrentJob();
         advanceCard();
       });
@@ -773,4 +779,56 @@ function createId() {
   }
 
   return `entry-${Date.now().toString(36)}-${Math.random().toString(16).slice(2)}`;
+}
+
+function makeJobIcon(job) {
+  const colors = [
+    ['#ffedd5', '#fb7185', '#f97316'],
+    ['#dbeafe', '#38bdf8', '#2563eb'],
+    ['#dcfce7', '#34d399', '#059669'],
+    ['#f3e8ff', '#c084fc', '#7c3aed'],
+    ['#fae8ff', '#f472b6', '#db2777'],
+    ['#fef3c7', '#f59e0b', '#d97706'],
+    ['#cffafe', '#22d3ee', '#0ea5e9'],
+  ];
+  const hash = Array.from(job.id).reduce((value, char) => value + char.charCodeAt(0), 0);
+  const [start, mid, end] = colors[hash % colors.length];
+  const iconSet = [
+    `<rect x='254' y='170' width='292' height='172' rx='52' fill='rgba(255,255,255,0.88)'/>`,
+    `<rect x='226' y='130' width='348' height='220' rx='42' fill='rgba(255,255,255,0.88)'/>`,
+    `<circle cx='400' cy='180' r='132' fill='rgba(255,255,255,0.88)'/>`,
+    `<path d='M210 260h380l-56 80H266z' fill='rgba(255,255,255,0.88)'/>`,
+  ];
+  const shape = iconSet[hash % iconSet.length];
+  const accent = [
+    `<path d='M290 150h220v34H290z' fill='${mid}' opacity='0.86'/>`,
+    `<path d='M306 184h188v28H306z' fill='${mid}' opacity='0.7'/>`,
+    `<circle cx='400' cy='182' r='52' fill='${start}' opacity='0.9'/>`,
+    `<path d='M318 200h164v18H318z' fill='${end}' opacity='0.86'/>`,
+  ][hash % 4];
+
+  return `url("data:image/svg+xml,${encodeURIComponent(`
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 360' role='img' aria-label='${job.company}のアイコン'>
+      <defs>
+        <linearGradient id='g' x1='0%' y1='0%' x2='100%' y2='100%'>
+          <stop offset='0%' stop-color='${start}'/>
+          <stop offset='52%' stop-color='${mid}'/>
+          <stop offset='100%' stop-color='${end}'/>
+        </linearGradient>
+      </defs>
+      <rect width='800' height='360' rx='34' fill='url(#g)'/>
+      <circle cx='190' cy='94' r='70' fill='rgba(255,255,255,0.18)'/>
+      <circle cx='650' cy='278' r='96' fill='rgba(255,255,255,0.16)'/>
+      <g transform='translate(0 4)'>
+        <rect x='144' y='110' width='512' height='144' rx='42' fill='rgba(255,255,255,0.34)'/>
+        ${shape}
+        ${accent}
+      </g>
+      <text x='64' y='312' fill='white' font-size='44' font-family='system-ui, -apple-system, sans-serif' font-weight='700' letter-spacing='1.5'>JOB</text>
+    </svg>
+  `)}")`;
+}
+
+function makeMapsUrl(location) {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`;
 }
